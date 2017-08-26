@@ -1,13 +1,6 @@
 var socket = io();
 socket.on('connect', function() {
     console.log('connected to server');
-
-    // emit createMessage event to the server
-    // socket.emit('createMessage',{
-    //     from: 'abs2',
-    //     text: 'message for abs2'
-    // });
-    
 });
 
 socket.on('disconnect', function() {
@@ -17,17 +10,19 @@ socket.on('disconnect', function() {
 // listen to newMessage event from server
 socket.on('newMessage', function(message){
     console.log('New message: ', message);
+    var formattedTime = moment(message.createdAt).format('h:mm:ss a');
     var li = jQuery('<li></li>');
-    li.text(`${message.from}: ${message.text}`);
+    li.text(`${message.from} ${formattedTime}: ${message.text}`);
     jQuery('#messages').append(li);
 });
 
 // listen to newMessage event from server
 socket.on('newLocationMessage', function(message){
     console.log('New message: ', message);
+    var formattedTime = moment(message.createdAt).format('h:mm:ss a');
     var li = jQuery('<li></li>');
     var a = jQuery('<a target="_blank">My Current Location</a>');
-    li.text(`${message.from}: `);
+    li.text(`${message.from} ${formattedTime}: `);
     a.attr('href', message.url);
     
     li.append(a);
