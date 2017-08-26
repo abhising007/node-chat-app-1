@@ -18,6 +18,20 @@ var port = process.env.PORT || 3000;
 io.on('connection', (socket)=>{
     console.log('New user connected');
 
+    // send the message to new client that joined
+    socket.emit('newMessage', {
+        from: 'admin',
+        text: 'Welcome to chat app',
+        createdAt: new Date().getTime()
+    });
+
+    // send the message to everyone else that new client joined
+    socket.broadcast.emit('newMessage',{
+        from: 'admin',
+        text: 'New user joined',
+        createdAt: new Date().getTime()
+    });
+
     // create newMessage custom event to be emitted to clients
     // socket.emit('newMessage', {
     //     to: 'abs1',
@@ -30,6 +44,13 @@ io.on('connection', (socket)=>{
         console.log('createMessage: ', newMessage);
         // emit the message to all connected clients
         io.emit('newMessage', {
+            from: newMessage.from,
+            text: newMessage.text,
+            createdAt: new Date().getTime()
+        });
+
+        //send the events to everyone but the source client
+        socket.broadcast.emit('newMessage', {
             from: newMessage.from,
             text: newMessage.text,
             createdAt: new Date().getTime()
