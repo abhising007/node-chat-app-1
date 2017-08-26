@@ -19,15 +19,21 @@ io.on('connection', (socket)=>{
     console.log('New user connected');
 
     // create newMessage custom event to be emitted to clients
-    socket.emit('newMessage', {
-        to: 'abs1',
-        text: 'message for abs1',
-        createdAt: 123
-    });
+    // socket.emit('newMessage', {
+    //     to: 'abs1',
+    //     text: 'message for abs1',
+    //     createdAt: 123
+    // });
     
     // event coming from client
     socket.on('createMessage', (newMessage)=> {
-        console.log('create message with: ', newMessage);
+        console.log('createMessage: ', newMessage);
+        // emit the message to all connected clients
+        io.emit('newMessage', {
+            from: newMessage.from,
+            text: newMessage.text,
+            createdAt: new Date().getTime()
+        });
     });
 
     socket.on('disconnect', () => {
