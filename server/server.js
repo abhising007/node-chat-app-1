@@ -4,6 +4,8 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
+const {generateMessage} = require('./utils/message');
+
 const publicPath = path.join(__dirname, '../public');
 
 var app = express();
@@ -19,18 +21,10 @@ io.on('connection', (socket)=>{
     console.log('New user connected');
 
     // send the message to new client that joined
-    socket.emit('newMessage', {
-        from: 'admin',
-        text: 'Welcome to chat app',
-        createdAt: new Date().getTime()
-    });
+    socket.emit('newMessage', generateMessage('admin', 'Welcome to Chat App'));
 
     // send the message to everyone else that new client joined
-    socket.broadcast.emit('newMessage',{
-        from: 'admin',
-        text: 'New user joined',
-        createdAt: new Date().getTime()
-    });
+    socket.broadcast.emit('newMessage', generateMessage('admin', 'New User Joined'));
 
     // create newMessage custom event to be emitted to clients
     // socket.emit('newMessage', {
@@ -43,11 +37,7 @@ io.on('connection', (socket)=>{
     socket.on('createMessage', (newMessage)=> {
         console.log('createMessage: ', newMessage);
         // emit the message to all connected clients
-        io.emit('newMessage', {
-            from: newMessage.from,
-            text: newMessage.text,
-            createdAt: new Date().getTime()
-        });
+        io.emit('newMessage', generateMessage(newMessage.from, newMessage.text));
 
         //send the events to everyone but the source client
         socket.broadcast.emit('newMessage', {
