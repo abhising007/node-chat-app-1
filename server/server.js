@@ -40,14 +40,7 @@ io.on('connection', (socket)=>{
         // emit the message to all connected clients
         io.emit('newMessage', generateMessage(newMessage.from, newMessage.text));
 
-        callback('This is from the server'); // send the acknowledgement to the client
-
-        //send the events to everyone but the source client
-        // socket.broadcast.emit('newMessage', {
-        //     from: newMessage.from,
-        //     text: newMessage.text,
-        //     createdAt: new Date().getTime()
-        // });
+        callback(); // send the acknowledgement to the client
     });
 
     // event coming from client

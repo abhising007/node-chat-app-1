@@ -35,38 +35,40 @@ socket.on('newLocationMessage', function(message){
 });
 
 
-// with callback that fires when the acknowledgement is received
-// socket.emit('createMessage',{
-//     from: 'frank',
-//     text: 'hi'
-// }, function(data){
-//     console.log('Got it: ', data);
-// });
-
 jQuery('#message-form').on('submit', function(e){
     e.preventDefault(); // prevent the default event handler
+
+    var messageTextBox = jQuery('[name=message]');
     socket.emit('createMessage',{
         from: 'User',
-        text: jQuery('[name=message]').val()
+        text: messageTextBox.val()
     }, function(data){
-        console.log('Got it: ', data);
+        messageTextBox.val('') //clear the value in text box on successful acknowledgement
     });
         
 });
 
 var locationButton = jQuery('#send-location');
 locationButton.on('click', function(e){
+
     if (!navigator.geolocation) {
         return alert('Geolocation not support by your browers');
     }
 
+    locationButton.attr('disabled', 'disabled'); // disable the button once its pressed
+    locationButton.text('Sending location');
+
     navigator.geolocation.getCurrentPosition(function(position){
         console.log('Position: ', position);
+        locationButton.removeAttr('disabled'); // enable the button once response is back
+        locationButton.text('Send location');
         socket.emit('createLocationMessage', {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
         });
     }, function(){
+        locationButton.removeAttr('disabled'); // enable the button once response is back
+        locationButton.text('Send location');
         alert('Unable to fetch location');
     });
 });
