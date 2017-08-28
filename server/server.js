@@ -47,21 +47,24 @@ io.on('connection', (socket)=>{
     
     // event coming from client
     socket.on('createMessage', (newMessage, callback)=> {
-        console.log('createMessage: ', newMessage);
-        
-        // emit the message to all connected clients
-        io.emit('newMessage', generateMessage(newMessage.from, newMessage.text));
+        var user = users.getUser(socket.id);
 
+        if (user && isRealString(newMessage.text)) {
+            // emit the message to all connected clients
+            io.to(user.room).emit('newMessage', generateMessage(user.name, newMessage.text));
+        }
         callback(); // send the acknowledgement to the client
     });
 
     // event coming from client
     socket.on('createLocationMessage', (coordinates)=> {
-        console.log('createLocationMessage: ', coordinates);
-        
+        var user = users.getUser(socket.id);
+
+        if (user) {
         // emit the message to all connected clients
-        io.emit('newLocationMessage', 
-        generateLocationMessage('admin', coordinates.latitude, coordinates.longitude));
+        io.to(user.room).emit('newLocationMessage', 
+            generateLocationMessage(user.name, coordinates.latitude, coordinates.longitude));
+        }
 
         // callback('This is from the server'); // send the acknowledgement to the client
     });
